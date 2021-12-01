@@ -10,7 +10,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class UserService {
-
+    //지금까지 서비스단에서 repository가 자기 것만 있는 것이 깔끔하다고 생각했었는데, 복잡한 프로젝트에선 그리고 이번 프로젝트 상황을 보아하니 이게 맞나보다.
     private final KakaoOAuth2 kakaoOAuth2;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
@@ -19,6 +19,7 @@ public class UserService {
     private final ProjectService projectService;
     private final NoteService noteService;
 
+    //프로퍼티 파일에서 사용하는듯함
     @Value("${app.auth.tokenSecret}")
     private String secretKey;
 
@@ -51,6 +52,7 @@ public class UserService {
             kakaoUser.update(name, picture);
             userRepository.save(kakaoUser);
         } else { // 새 유저
+            //빌더패턴
             kakaoUser = User.builder()
                     .email(email)
                     .picture(picture)
@@ -110,6 +112,7 @@ public class UserService {
     public String login(SignupRequestDto requestDto) {
         User user = userRepository.findByName(requestDto.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 유저입니다."));
+        //passwordEncoder는 두가지 메소드를 가지는데 matches와 encode임 matches는 두 값을 비교하는 것
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("잘못된 비밀번호입니다.");
         }
